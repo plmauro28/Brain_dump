@@ -1,7 +1,16 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
 
-export const useStore = create((set, get) => ({
+export const useStore = create(persist((set, get) => ({
+  preferences: {
+    language: 'es',
+    theme: 'dark',
+    accentColor: '#10b981' // Emerald as default hex
+  },
+  setPreferences: (newPrefs) => set(state => ({
+    preferences: { ...state.preferences, ...newPrefs }
+  })),
   tasks: [],
   reminders: [],
   suggestions: [],
@@ -244,4 +253,7 @@ export const useStore = create((set, get) => ({
     }
   }
 
+}), {
+  name: 'brain-dump-preferences',
+  partialize: (state) => ({ preferences: state.preferences })
 }));

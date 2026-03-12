@@ -11,7 +11,9 @@ import MemoryLane from '../components/MemoryLane';
 import MapWidget from '../components/MapWidget';
 import CalendarWidget from '../components/CalendarWidget';
 import ExpandModal from '../components/ExpandModal';
-import { Maximize2 } from 'lucide-react';
+import SettingsModal from '../components/SettingsModal';
+import { Maximize2, Settings } from 'lucide-react';
+import { useTranslation } from '../lib/i18n';
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
@@ -24,6 +26,9 @@ export default function Dashboard() {
   
   // Widget Expansion State
   const [expandedWidget, setExpandedWidget] = useState(null); // 'map' | 'calendar' | 'memory' | null
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  
+  const { t } = useTranslation();
   
   const textareaRef = useRef(null);
 
@@ -79,7 +84,7 @@ export default function Dashboard() {
         setText('');
     } catch (err) {
         console.error(err);
-        setError(err.message || "Ocurrió un error al procesar tu Brain-Dump.");
+        setError(err.message || "Error procesando.");
     } finally {
         setIsLoading(false);
     }
@@ -100,17 +105,26 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 font-medium bg-gray-50 dark:bg-gray-800 py-1.5 px-3 rounded-full">
+              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 font-medium bg-gray-50 dark:bg-gray-800 py-1.5 px-3 rounded-full mr-2">
                 <User className="w-4 h-4 text-brand-500" />
                 <span>{currentUser?.email}</span>
               </div>
+              
+              <button 
+                onClick={() => setIsSettingsOpen(true)}
+                className="p-2 text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-full transition-colors"
+                title={t('settings')}
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+
               <button 
                 onClick={handleLogout}
                 className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 flex-shrink-0 transition-colors"
-                title="Cerrar sesión"
+                title={t('signOut')}
               >
                 <LogOut className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Salir</span>
+                <span className="hidden sm:inline">{t('signOut')}</span>
               </button>
             </div>
           </div>
@@ -141,7 +155,7 @@ export default function Dashboard() {
                             }}
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
-                            placeholder="Escribe todo lo que tienes en la cabeza..."
+                            placeholder={t('placeholder')}
                             className="w-full bg-transparent text-xl text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500/80 resize-none outline-none focus:ring-0 min-h-[120px] leading-relaxed transition-all"
                             disabled={isLoading}
                             spellCheck="false"
@@ -156,7 +170,7 @@ export default function Dashboard() {
 
                         <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800/50 flex justify-between items-center">
                             <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline-block">
-                                La IA extraerá tareas, memorias, ubicaciones y fechas automáticamente.
+                                {t('aiSubtitle')}
                             </span>
                             <button
                                 onClick={handleOrganize}
@@ -171,12 +185,12 @@ export default function Dashboard() {
                                 {isLoading ? (
                                     <>
                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                    Pensando...
+                                    {t('loadingMagic')}
                                     </>
                                 ) : (
                                     <>
                                     <Sparkles className="w-5 h-5 group-hover:scale-110 group-hover:rotate-12 transition-transform" />
-                                    Organizar mi Caos
+                                    {t('organizeBtn')}
                                     </>
                                 )}
                             </button>
@@ -226,7 +240,7 @@ export default function Dashboard() {
                 
                 {/* Stats Widget */}
                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 relative group/widget">
-                     <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">Progreso Global</h3>
+                     <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">{t('globalProgress')}</h3>
                      <div className="flex items-center gap-5">
                          <div className="relative w-20 h-20 shrink-0">
                              <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 36 36">
@@ -257,7 +271,7 @@ export default function Dashboard() {
                              <p className="text-2xl font-bold text-gray-900 dark:text-white leading-none">
                                 {stats.completedCount} <span className="text-sm text-gray-400 font-normal">/ {stats.totalCount}</span>
                              </p>
-                             <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">Completadas</p>
+                             <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">{t('completed')}</p>
                          </div>
                      </div>
                      <button onClick={() => setExpandedWidget('stats')} className="absolute top-4 right-4 p-2 bg-white/50 backdrop-blur-sm dark:bg-gray-900/50 rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -379,6 +393,11 @@ export default function Dashboard() {
             </div>
         </div>
       </ExpandModal>
+
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+      />
 
     </div>
   );
