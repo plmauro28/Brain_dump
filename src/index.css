@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply transition-colors duration-200;
+  }
+}
+
+/* Base custom markdown styles to ensure react-markdown renders nicely */
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  @apply font-bold mt-6 mb-4 text-gray-900 dark:text-white;
+}
+
+.markdown-body h1 {
+  @apply text-2xl;
+}
+.markdown-body h2 {
+  @apply text-xl;
+  @apply border-b border-gray-200 dark:border-gray-700 pb-2;
+}
+.markdown-body h3 {
+  @apply text-lg;
+}
+
+.markdown-body ul, .markdown-body ol {
+  @apply my-4 pl-6 space-y-2;
+}
+
+.markdown-body ul {
+  @apply list-disc;
+}
+
+.markdown-body ol {
+  @apply list-decimal;
+}
+
+.markdown-body li {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.markdown-body p {
+  @apply my-4 text-gray-700 dark:text-gray-300 leading-relaxed;
+}
+
+.markdown-body strong {
+  @apply font-semibold text-gray-900 dark:text-white;
+}
