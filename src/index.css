@@ -79,7 +79,7 @@
   }
 
   .lava-blob {
-    @apply absolute rounded-full mix-blend-multiply filter blur-[80px] sm:blur-[120px] opacity-60 transition-colors duration-500;
+    @apply absolute rounded-full filter blur-[80px] sm:blur-[120px] opacity-80 sm:opacity-60 transition-colors duration-500;
     will-change: transform;
     animation: lava-rise infinite ease-in-out;
   }
@@ -101,39 +101,55 @@
   }
 
   .lava-blob-1 {
-    width: 45vw; height: 45vw;
+    width: 60vmin; height: 60vmin;
     left: 5%;
     background-color: var(--brand-300);
     animation-duration: 22s;
     animation-delay: -2s;
   }
   .lava-blob-2 {
-    width: 60vw; height: 60vw;
+    width: 75vmin; height: 75vmin;
     left: 45%;
     background-color: var(--brand-500);
     animation-duration: 28s;
     animation-delay: -14s;
   }
   .lava-blob-3 {
-    width: 35vw; height: 35vw;
-    left: 75%;
+    width: 50vmin; height: 50vmin;
+    left: 70%;
     background-color: var(--brand-400);
     animation-duration: 18s;
     animation-delay: -7s;
   }
   .lava-blob-4 {
-    width: 50vw; height: 50vw;
+    width: 70vmin; height: 70vmin;
     left: -10%;
     background-color: var(--brand-200);
     animation-duration: 32s;
     animation-delay: -20s;
   }
   .lava-blob-5 {
-    width: 40vw; height: 40vw;
-    left: 60%;
+    width: 55vmin; height: 55vmin;
+    left: 40%;
     background-color: var(--brand-600);
     animation-duration: 25s;
     animation-delay: 0s;
+  }
+
+  /* Adjustments strictly for mobile portrait to make them larger & overlap the height */
+  @media (max-width: 640px) {
+    .lava-blob {
+      filter: blur(60px); /* Sharper blobs on mobile so color is clearer */
+      opacity: 0.95; /* Very strong opacity on mobile light mode */
+    }
+    .dark .lava-blob {
+      opacity: 0.5; /* Slightly stronger on dark mode too */
+    }
+    .lava-blob-1 { width: 140vw; height: 140vw; left: -20%; }
+    .lava-blob-2 { width: 160vw; height: 160vw; left: 10%; }
+    .lava-blob-3 { width: 120vw; height: 120vw; left: 50%; }
+    .lava-blob-4 { width: 150vw; height: 150vw; left: -30%; }
+    .lava-blob-5 { width: 130vw; height: 130vw; left: 30%; }
   }
 }
 
@@ -153,11 +169,11 @@
   
   /* Glassmorphism Utilities */
   .glass-panel {
-    @apply bg-white/60 dark:bg-gray-900/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
+    @apply bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
   }
   
   .glass-card {
-    @apply bg-white/50 dark:bg-gray-800/30 backdrop-blur-md border border-white/40 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300;
+    @apply bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border border-white/50 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300;
   }
 }
 
