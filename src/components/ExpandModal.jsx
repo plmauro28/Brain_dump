@@ -25,16 +25,16 @@ export default function ExpandModal({ isOpen, onClose, title, children }) {
       />
       
       {/* Modal Content */}
-      <div className="relative w-full h-full max-w-6xl max-h-[90vh] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative w-full h-full max-w-6xl max-h-[90vh] glass-panel rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+        <div className="flex items-center justify-between p-6 border-b border-white/20 dark:border-white/10 z-10">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
             {title}
           </h2>
           <button 
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full transition-all"
+            className="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 glass-card rounded-full transition-all"
             title="Cerrar"
           >
             <X className="w-6 h-6" />
@@ -42,7 +42,7 @@ export default function ExpandModal({ isOpen, onClose, title, children }) {
         </div>
 
         {/* Body - We reset padding so children components control their own space */}
-        <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-950 p-6">
+        <div className="flex-1 overflow-auto bg-transparent p-6">
           {children}
         </div>
 

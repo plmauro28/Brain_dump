@@ -70,7 +70,94 @@
   }
 
   body {
-    @apply transition-colors duration-200;
+    @apply transition-colors duration-500 min-h-screen text-gray-900 dark:text-gray-100 bg-transparent;
+  }
+
+  /* Infinite Lava Lamp Background */
+  .lava-bg {
+    @apply fixed inset-0 -z-50 overflow-hidden pointer-events-none transition-colors duration-700 bg-gray-50 dark:bg-gray-950;
+  }
+
+  .lava-blob {
+    @apply absolute rounded-full mix-blend-multiply filter blur-[80px] sm:blur-[120px] opacity-60 transition-colors duration-500;
+    will-change: transform;
+    animation: lava-rise infinite ease-in-out;
+  }
+  
+  .dark .lava-blob {
+    @apply mix-blend-screen opacity-30;
+  }
+
+  @keyframes lava-rise {
+    0% {
+      transform: translateY(120vh) scale(0.9);
+    }
+    50% {
+      transform: translateY(10vh) scale(1.15);
+    }
+    100% {
+      transform: translateY(-120vh) scale(0.9);
+    }
+  }
+
+  .lava-blob-1 {
+    width: 45vw; height: 45vw;
+    left: 5%;
+    background-color: var(--brand-300);
+    animation-duration: 22s;
+    animation-delay: -2s;
+  }
+  .lava-blob-2 {
+    width: 60vw; height: 60vw;
+    left: 45%;
+    background-color: var(--brand-500);
+    animation-duration: 28s;
+    animation-delay: -14s;
+  }
+  .lava-blob-3 {
+    width: 35vw; height: 35vw;
+    left: 75%;
+    background-color: var(--brand-400);
+    animation-duration: 18s;
+    animation-delay: -7s;
+  }
+  .lava-blob-4 {
+    width: 50vw; height: 50vw;
+    left: -10%;
+    background-color: var(--brand-200);
+    animation-duration: 32s;
+    animation-delay: -20s;
+  }
+  .lava-blob-5 {
+    width: 40vw; height: 40vw;
+    left: 60%;
+    background-color: var(--brand-600);
+    animation-duration: 25s;
+    animation-delay: 0s;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  }
+  
+  /* Glassmorphism Utilities */
+  .glass-panel {
+    @apply bg-white/60 dark:bg-gray-900/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
+  }
+  
+  .glass-card {
+    @apply bg-white/50 dark:bg-gray-800/30 backdrop-blur-md border border-white/40 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300;
   }
 }
 

@@ -91,10 +91,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen text-gray-900 dark:text-white flex flex-col transition-colors duration-500">
       
       {/* Top Navigation */}
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50">
+      <nav className="glass-panel sticky top-0 z-50 sm:mx-4 sm:mt-4 sm:rounded-2xl border-x-0 sm:border-x">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
@@ -105,7 +105,7 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 font-medium bg-gray-50 dark:bg-gray-800 py-1.5 px-3 rounded-full mr-2">
+              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 font-medium glass-card py-1.5 px-3 rounded-full mr-2">
                 <User className="w-4 h-4 text-brand-500" />
                 <span>{currentUser?.email}</span>
               </div>
@@ -141,9 +141,9 @@ export default function Dashboard() {
             <div className="lg:col-span-8 flex flex-col gap-6 lg:gap-8 min-w-0">
                 
                 {/* Input Dump Area */}
-                <div className={`bg-white dark:bg-gray-900 rounded-3xl shadow-sm border transition-all duration-300 overflow-hidden relative z-10 flex-shrink-0
-                    ${isFocused && !error ? 'border-brand-400 dark:border-brand-600 ring-4 ring-brand-100 dark:ring-brand-900/20' : ''}
-                    ${error ? 'border-red-400 dark:border-red-600 ring-4 ring-red-100 dark:ring-red-900/20' : 'border-gray-100 dark:border-gray-800'}
+                <div className={`glass-panel rounded-3xl transition-all duration-300 overflow-hidden relative z-10 flex-shrink-0
+                    ${isFocused && !error ? 'border-brand-400/50 dark:border-brand-400/50 ring-4 ring-brand-500/10' : ''}
+                    ${error ? 'border-red-400/50 ring-4 ring-red-500/10' : ''}
                 `}>
                     <div className="p-5 sm:p-6 flex flex-col">
                         <textarea
@@ -204,8 +204,8 @@ export default function Dashboard() {
                     {memories.length > 0 && (
                         <div className="relative group/widget">
                            <MemoryLane memories={memories} onDelete={(id) => deleteMemory(currentUser.id, id)} />
-                           <button onClick={() => setExpandedWidget('memory')} className="absolute top-4 right-4 p-2 bg-white/50 backdrop-blur-sm dark:bg-gray-900/50 rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-                              <Maximize2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                           <button onClick={() => setExpandedWidget('memory')} className="absolute top-4 right-4 p-2 glass-card rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity z-10 hover:scale-105">
+                              <Maximize2 className="w-4 h-4 text-gray-700 dark:text-gray-200" />
                            </button>
                         </div>
                     )}
@@ -214,15 +214,15 @@ export default function Dashboard() {
                     {locations.length > 0 && (
                         <div className="relative group/widget">
                            <MapWidget locations={locations} />
-                           <button onClick={() => setExpandedWidget('map')} className="absolute top-4 right-4 p-2 bg-white/50 backdrop-blur-sm dark:bg-gray-900/50 rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 z-10">
-                              <Maximize2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                           <button onClick={() => setExpandedWidget('map')} className="absolute top-4 right-4 p-2 glass-card rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity z-10 hover:scale-105">
+                              <Maximize2 className="w-4 h-4 text-gray-700 dark:text-gray-200" />
                            </button>
                         </div>
                     )}
                 </div>
 
                 {/* Tasks Board Widget */}
-                <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 overflow-hidden flex flex-col h-[500px]">
+                <div className="glass-panel rounded-3xl p-5 sm:p-6 overflow-hidden flex flex-col h-[500px]">
                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex-shrink-0">Mis Tareas Continuas</h2>
                      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                         <TaskBoard 
@@ -239,7 +239,7 @@ export default function Dashboard() {
             <div className="lg:col-span-4 flex flex-col gap-6 lg:gap-8">
                 
                 {/* Stats Widget */}
-                 <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 relative group/widget">
+                 <div className="glass-panel rounded-3xl p-5 sm:p-6 relative group/widget">
                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">{t('globalProgress')}</h3>
                      <div className="flex items-center gap-5">
                          <div className="relative w-20 h-20 shrink-0">
@@ -274,16 +274,16 @@ export default function Dashboard() {
                              <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">{t('completed')}</p>
                          </div>
                      </div>
-                     <button onClick={() => setExpandedWidget('stats')} className="absolute top-4 right-4 p-2 bg-white/50 backdrop-blur-sm dark:bg-gray-900/50 rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-                        <Maximize2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                     <button onClick={() => setExpandedWidget('stats')} className="absolute top-4 right-4 p-2 glass-card rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity z-10 hover:scale-105">
+                        <Maximize2 className="w-4 h-4 text-gray-700 dark:text-gray-200" />
                      </button>
                  </div>
                  
                  {/* Calendar Component Wrapper */}
                  <div className="relative group/widget">
                     <CalendarWidget reminders={reminders} />
-                    <button onClick={() => setExpandedWidget('calendar')} className="absolute top-4 right-4 p-2 bg-white/50 backdrop-blur-sm dark:bg-gray-900/50 rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-                        <Maximize2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <button onClick={() => setExpandedWidget('calendar')} className="absolute top-4 right-4 p-2 glass-card rounded-lg opacity-0 group-hover/widget:opacity-100 transition-opacity z-10 hover:scale-105">
+                        <Maximize2 className="w-4 h-4 text-gray-700 dark:text-gray-200" />
                     </button>
                  </div>
 

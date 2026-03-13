@@ -5,14 +5,14 @@ export default function MemoryLane({ memories, onDelete }) {
   if (!memories || memories.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 flex flex-col h-full h-[300px]">
+    <div className="glass-panel rounded-3xl p-5 sm:p-6 flex flex-col h-full h-[300px]">
       <div className="flex items-center gap-2 mb-4">
         <BrainCircuit className="w-5 h-5 text-indigo-500" />
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">Memoria a Largo Plazo</h3>
       </div>
       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
         {memories.map((mem) => (
-          <div key={mem.id} className="p-3 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/20 rounded-xl relative group hover:shadow-md transition-shadow">
+          <div key={mem.id} className="p-3 glass-card rounded-xl relative group">
             <p className="text-sm text-gray-800 dark:text-gray-200 pr-6 leading-relaxed">
               {mem.text}
             </p>

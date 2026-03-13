@@ -69,6 +69,13 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <div className="lava-bg">
+        <div className="lava-blob lava-blob-1"></div>
+        <div className="lava-blob lava-blob-2"></div>
+        <div className="lava-blob lava-blob-3"></div>
+        <div className="lava-blob lava-blob-4"></div>
+        <div className="lava-blob lava-blob-5"></div>
+      </div>
       <BrowserRouter>
         <AuthProvider>
           <AppRoutes />

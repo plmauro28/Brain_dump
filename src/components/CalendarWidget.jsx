@@ -14,7 +14,7 @@ export default function CalendarWidget({ reminders, isExpanded }) {
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 flex flex-col ${isExpanded ? 'h-full w-full border-none shadow-none' : ''}`}>
+    <div className={`glass-panel rounded-3xl p-5 sm:p-6 flex flex-col ${isExpanded ? 'h-full w-full border-none shadow-none' : ''}`}>
       <div className="flex items-center gap-2 mb-4">
         <CalendarDays className="w-5 h-5 text-brand-500" />
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">Mi Calendario</h3>

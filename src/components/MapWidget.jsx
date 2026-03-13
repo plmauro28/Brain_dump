@@ -49,14 +49,14 @@ export default function MapWidget({ locations, isExpanded }) {
   if (!locations || locations.length === 0) return null;
 
   return (
-    <div className={`bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 flex flex-col ${isExpanded ? 'h-full w-full border-none shadow-none' : 'h-[300px]'}`}>
+    <div className={`glass-panel rounded-3xl p-5 sm:p-6 flex flex-col ${isExpanded ? 'h-full w-full border-none shadow-none' : 'h-[300px]'}`}>
       <div className="flex items-center gap-2 mb-4">
         <MapPin className="w-5 h-5 text-emerald-500" />
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">Ubicaciones Mencionadas</h3>
       </div>
       <div 
         ref={containerRef} 
-        className="flex-1 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 z-0 relative isolate"
+        className="flex-1 rounded-xl overflow-hidden border border-white/20 dark:border-white/10 z-0 relative isolate"
         style={{ width: '100%', height: '100%' }}
       />
     </div>

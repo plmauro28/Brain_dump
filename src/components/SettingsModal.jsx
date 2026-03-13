@@ -24,16 +24,16 @@ export default function SettingsModal({ isOpen, onClose }) {
         onClick={onClose}
       />
       
-      <div className="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800 flex flex-col animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-sm sm:max-w-md glass-panel rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
         
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between p-6 border-b border-white/20 dark:border-white/10">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Globe className="w-5 h-5 text-brand-500" />
             {t('settings')}
           </h2>
           <button 
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 glass-card rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -46,15 +46,15 @@ export default function SettingsModal({ isOpen, onClose }) {
             <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
               Idioma / Language
             </span>
-            <div className="flex bg-gray-100/50 dark:bg-gray-800/50 p-1.5 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex glass-card p-1.5 rounded-xl">
                {['es', 'en', 'fr'].map(langCode => (
                    <button
                      key={langCode}
                      onClick={() => setPreferences({ language: langCode })}
                      className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
                          preferences.language === langCode 
-                         ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm ring-1 ring-gray-200 dark:ring-gray-600' 
-                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-700/50'
+                         ? 'bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white shadow-sm ring-1 ring-white/50 dark:ring-white/10' 
+                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
                      }`}
                    >
                        {langCode.toUpperCase()}
@@ -71,10 +71,10 @@ export default function SettingsModal({ isOpen, onClose }) {
             <div className="flex gap-4">
                <button
                  onClick={() => setPreferences({ theme: 'light' })}
-                 className={`flex-1 flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all ${
+                 className={`flex-1 flex flex-col items-center gap-3 p-4 rounded-2xl transition-all ${
                      preferences.theme === 'light' 
-                     ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 shadow-sm' 
-                     : 'border-gray-100 dark:border-gray-800 hover:border-brand-200 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500'
+                     ? 'ring-2 ring-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300 shadow-sm' 
+                     : 'glass-card text-gray-600 dark:text-gray-400'
                  }`}
                >
                  <Sun className="w-7 h-7" />
@@ -82,10 +82,10 @@ export default function SettingsModal({ isOpen, onClose }) {
                </button>
                <button
                  onClick={() => setPreferences({ theme: 'dark' })}
-                 className={`flex-1 flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all ${
+                 className={`flex-1 flex flex-col items-center gap-3 p-4 rounded-2xl transition-all ${
                      preferences.theme === 'dark' 
-                     ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 shadow-sm' 
-                     : 'border-gray-100 dark:border-gray-800 hover:border-brand-200 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500'
+                     ? 'ring-2 ring-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300 shadow-sm' 
+                     : 'glass-card text-gray-600 dark:text-gray-400'
                  }`}
                >
                  <Moon className="w-7 h-7" />
@@ -99,7 +99,7 @@ export default function SettingsModal({ isOpen, onClose }) {
             <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-2">
               <Palette className="w-4 h-4" /> Color Principal
             </span>
-            <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/30 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
+            <div className="flex justify-between items-center glass-card p-4 rounded-2xl">
                {COLORS.map(color => (
                    <button
                      key={color.value}

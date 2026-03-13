@@ -6,10 +6,10 @@ import { Calendar, Clock, Trash2 } from 'lucide-react';
 export default function RemindersWidget({ reminders, onDelete }) {
   if (!reminders || reminders.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 flex-1 flex flex-col">
+      <div className="glass-panel rounded-3xl p-5 sm:p-6 flex-1 flex flex-col">
         <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Recordatorios</h3>
         <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-          <Calendar className="w-10 h-10 text-gray-200 dark:text-gray-800 mb-2" />
+          <Calendar className="w-10 h-10 text-gray-400/50 mb-2" />
           <p className="text-sm text-gray-400 dark:text-gray-500">No hay eventos próximos detectados por la IA.</p>
         </div>
       </div>
@@ -37,7 +37,7 @@ export default function RemindersWidget({ reminders, onDelete }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 sm:p-6 flex-1 flex flex-col">
+    <div className="glass-panel rounded-3xl p-5 sm:p-6 flex-1 flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Recordatorios</h3>
         <span className="bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 text-xs font-bold px-2 py-1 rounded-full">
@@ -52,10 +52,10 @@ export default function RemindersWidget({ reminders, onDelete }) {
             return (
                 <div 
                     key={reminder.id} 
-                    className={`relative group flex flex-col p-3 rounded-xl border transition-colors
+                    className={`relative group flex flex-col p-3 rounded-xl transition-colors
                         ${past 
-                            ? 'bg-gray-50 dark:bg-gray-800/20 border-gray-100 dark:border-gray-800/50 opacity-70' 
-                            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-brand-200 dark:hover:border-brand-800'
+                            ? 'bg-white/10 dark:bg-gray-900/10 border border-transparent opacity-50 backdrop-blur-sm' 
+                            : 'glass-card hover:border-brand-200 dark:hover:border-brand-800'
                         }
                     `}
                 >
@@ -80,8 +80,8 @@ export default function RemindersWidget({ reminders, onDelete }) {
                     <div className="flex items-center gap-3">
                         <div className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md
                             ${past 
-                                ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300' 
-                                : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400' 
+                                ? 'bg-white/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300' 
+                                : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20' 
                             }
                         `}>
                             <Calendar className="w-3 h-3" />

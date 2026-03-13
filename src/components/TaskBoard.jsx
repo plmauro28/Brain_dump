@@ -39,8 +39,8 @@ export default function TaskBoard({ tasks, onToggle, onDelete }) {
                                 key={task.id}
                                 className={`group flex items-center justify-between p-3 sm:p-4 rounded-xl border transition-all duration-200 cursor-pointer
                                     ${task.isCompleted 
-                                        ? 'bg-gray-50 dark:bg-gray-800/30 border-transparent opacity-60' 
-                                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-brand-300 dark:hover:border-brand-600'
+                                        ? 'bg-white/10 dark:bg-gray-900/10 border-transparent opacity-50 backdrop-blur-sm' 
+                                        : 'glass-card hover:border-brand-300 dark:hover:border-brand-600'
                                     }
                                 `}
                             >
