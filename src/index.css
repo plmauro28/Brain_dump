@@ -78,6 +78,12 @@
 
   body {
     @apply transition-colors duration-500 min-h-screen text-gray-900 dark:text-gray-100 bg-transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Global touch optimization to remove 300ms delays */
+  a, button, input, select, textarea, [role="button"] {
+    touch-action: manipulation;
   }
 
   /* Infinite Lava Lamp Background */
@@ -86,13 +92,15 @@
   }
 
   .lava-blob {
-    @apply absolute rounded-full filter blur-[80px] sm:blur-[120px] opacity-80 sm:opacity-60 transition-colors duration-500;
+    @apply absolute rounded-full opacity-80 sm:opacity-60 transition-colors duration-500;
     will-change: transform;
     animation: lava-rise infinite ease-in-out;
+    /* Use radial-gradient instead of heavy filter: blur() for extreme performance */
+    filter: none !important;
   }
   
   .dark .lava-blob {
-    @apply mix-blend-screen opacity-30;
+    @apply opacity-40;
   }
 
   @keyframes lava-rise {
@@ -110,35 +118,35 @@
   .lava-blob-1 {
     width: 60vmin; height: 60vmin;
     left: 5%;
-    background-color: var(--brand-300);
+    background: radial-gradient(circle at center, var(--brand-300) 0%, transparent 70%);
     animation-duration: 22s;
     animation-delay: -2s;
   }
   .lava-blob-2 {
     width: 75vmin; height: 75vmin;
     left: 45%;
-    background-color: var(--brand-500);
+    background: radial-gradient(circle at center, var(--brand-500) 0%, transparent 70%);
     animation-duration: 28s;
     animation-delay: -14s;
   }
   .lava-blob-3 {
     width: 50vmin; height: 50vmin;
     left: 70%;
-    background-color: var(--brand-400);
+    background: radial-gradient(circle at center, var(--brand-400) 0%, transparent 70%);
     animation-duration: 18s;
     animation-delay: -7s;
   }
   .lava-blob-4 {
     width: 70vmin; height: 70vmin;
     left: -10%;
-    background-color: var(--brand-200);
+    background: radial-gradient(circle at center, var(--brand-200) 0%, transparent 70%);
     animation-duration: 32s;
     animation-delay: -20s;
   }
   .lava-blob-5 {
     width: 55vmin; height: 55vmin;
     left: 40%;
-    background-color: var(--brand-600);
+    background: radial-gradient(circle at center, var(--brand-600) 0%, transparent 70%);
     animation-duration: 25s;
     animation-delay: 0s;
   }
@@ -146,11 +154,10 @@
   /* Adjustments strictly for mobile portrait to make them larger & overlap the height */
   @media (max-width: 640px) {
     .lava-blob {
-      filter: blur(60px); /* Sharper blobs on mobile so color is clearer */
       opacity: 0.95; /* Very strong opacity on mobile light mode */
     }
     .dark .lava-blob {
-      opacity: 0.5; /* Slightly stronger on dark mode too */
+      opacity: 0.6; /* Lightened dark mode so colors show through glass better */
     }
     .lava-blob-1 { width: 140vw; height: 140vw; left: -20%; }
     .lava-blob-2 { width: 160vw; height: 160vw; left: 10%; }
@@ -176,11 +183,11 @@
   
   /* Glassmorphism Utilities */
   .glass-panel {
-    @apply bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
+    @apply bg-white/40 dark:bg-gray-900/40 backdrop-blur-md sm:backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
   }
   
   .glass-card {
-    @apply bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border border-white/50 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300;
+    @apply bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm sm:backdrop-blur-md border border-white/50 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300;
   }
 }
 
