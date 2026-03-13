@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply bg-gray-50;
+  }
+  html.dark {
+    @apply bg-gray-950;
+  }
+
   :root {
     /* Emerald (Default) */
     --brand-50: #f0fdfa;

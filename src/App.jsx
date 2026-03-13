@@ -55,10 +55,19 @@ function App() {
 
   useEffect(() => {
     // Apply Theme
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement('meta');
+      metaThemeColor.name = 'theme-color';
+      document.head.appendChild(metaThemeColor);
+    }
+
     if (preferences?.theme === 'dark') {
       document.documentElement.classList.add('dark');
+      metaThemeColor.content = '#030712'; // Match dark background
     } else {
       document.documentElement.classList.remove('dark');
+      metaThemeColor.content = '#f9fafb'; // Match light background
     }
 
     // Apply Accent Color
