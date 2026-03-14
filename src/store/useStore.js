@@ -16,11 +16,16 @@ export const useStore = create(persist((set, get) => ({
   suggestions: [],
   memories: [],
   locations: JSON.parse(localStorage.getItem('brain_dump_locations') || '[]'),
-  stats: {
-    urgentPercentage: 0,
-    completedCount: 0,
-    totalCount: 0
-  },
+   stats: {
+     urgentPercentage: 0,
+     completedCount: 0,
+     totalCount: 0,
+     completedThisWeek: 0,
+     totalThisWeek: 0,
+     completionRate: 0,
+     completedTasks: [],
+     incompleteTasks: []
+   },
   loading: false,
 
   // Escuchar tareas en tiempo real
@@ -36,25 +41,48 @@ export const useStore = create(persist((set, get) => ({
             .eq('user_id', userId)
             .order('createdAt', { ascending: false });
             
-        if (!error && data) {
-            let completed = 0;
-            let urgent = 0;
-            
-            data.forEach(task => {
-                if (task.isCompleted) completed++;
-                if (task.category?.toLowerCase() === 'urgente') urgent++;
-            });
-            
-            set({ 
-                tasks: data,
-                stats: {
-                    completedCount: completed,
-                    totalCount: data.length,
-                    urgentPercentage: data.length > 0 ? Math.round((urgent / data.length) * 100) : 0
-                },
-                loading: false
-            });
-        }
+         if (!error && data) {
+             let completed = 0;
+             let urgent = 0;
+             let completedThisWeek = 0;
+             let totalThisWeek = 0;
+             const completedTasks = [];
+             const incompleteTasks = [];
+             
+             const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+             
+             data.forEach(task => {
+                 if (task.isCompleted) completed++;
+                 if (task.category?.toLowerCase() === 'urgente') urgent++;
+                 
+                 // Weekly stats
+                 const taskDate = new Date(task.createdAt);
+                 if (taskDate >= oneWeekAgo) {
+                     totalThisWeek++;
+                     if (task.isCompleted) {
+                         completedThisWeek++;
+                         completedTasks.push(task);
+                     } else {
+                         incompleteTasks.push(task);
+                     }
+                 }
+             });
+             
+             set({ 
+                 tasks: data,
+                 stats: {
+                     completedCount: completed,
+                     totalCount: data.length,
+                     urgentPercentage: data.length > 0 ? Math.round((urgent / data.length) * 100) : 0,
+                     completedThisWeek,
+                     totalThisWeek,
+                     completionRate: totalThisWeek > 0 ? Math.round((completedThisWeek / totalThisWeek) * 100) : 0,
+                     completedTasks,
+                     incompleteTasks
+                 },
+                 loading: false
+             });
+         }
     };
     
     fetchTasks();
@@ -133,6 +161,21 @@ export const useStore = create(persist((set, get) => ({
       if (!userId || !reminderId) return;
       await supabase.from('reminders').delete().eq('id', reminderId);
       set(state => ({ reminders: state.reminders.filter(r => r.id !== reminderId) }));
+  },
+
+  addReminder: async (userId, title, date) => {
+      if (!userId || !title || !date) return;
+      
+      const { data, error } = await supabase
+        .from('reminders')
+        .insert({ user_id: userId, title, date })
+        .select()
+        .single();
+        
+      if (!error && data) {
+         // Optionally update local state instantly, though the real-time subscription will also catch it
+         set(state => ({ reminders: [...state.reminders, data] }));
+      }
   },
 
   // Inyectar resultados de la IA a Supabase
