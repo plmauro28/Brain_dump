@@ -186,6 +186,8 @@ export const useStore = create(persist((set, get) => ({
     }
 
     console.log("saveAiResults called with:", { userId, parsedData });
+    const newTasks = [];
+    const newReminders = [];
 
     try {
         // 1. Guardar el dump (historial conversacional)
@@ -212,15 +214,17 @@ export const useStore = create(persist((set, get) => ({
                             title: task.title,
                             category: task.category
                         }).eq('id', task.id).eq('user_id', userId);
+                        newTasks.push({ ...task, id: task.id });
                     } else {
                         // ID no existe, crear nueva tarea
                         console.log("ID invented, creating new task:", task.title);
-                        await supabase.from('tasks').insert({
+                        const { data: newTask } = await supabase.from('tasks').insert({
                             user_id: userId,
                             title: task.title,
                             category: task.category || 'General',
                             isCompleted: task.isCompleted || false
-                        });
+                        }).select().single();
+                        if (newTask) newTasks.push(newTask);
                     }
                 } else if (task.id && task._delete) {
                     // Delete
@@ -238,9 +242,19 @@ export const useStore = create(persist((set, get) => ({
                     console.log("Task insert result:", result);
                     if (result.error) {
                         console.error("Error inserting task:", result.error);
+                    } else if (result.data) {
+                        newTasks.push(...result.data);
                     }
                 }
             }
+        }
+
+        // Update local state immediately for better UX
+        if (newTasks.length > 0) {
+            console.log("Updating local task state with:", newTasks);
+            set(state => ({ 
+                tasks: [...state.tasks, ...newTasks.filter(nt => !state.tasks.some(et => et.id === nt.id))]
+            }));
         }
 
         // Procesar Recordatorios
