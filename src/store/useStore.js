@@ -196,20 +196,38 @@ export const useStore = create(persist((set, get) => ({
         if (parsedData.tasks && Array.isArray(parsedData.tasks)) {
             console.log("Processing tasks:", parsedData.tasks);
             for (const task of parsedData.tasks) {
-                if (task.id) {
-                    // Update or Delete existing
-                    console.log("Updating task:", task.id);
-                    if (task._delete) {
-                        await supabase.from('tasks').delete().eq('id', task.id).eq('user_id', userId);
-                    } else {
-                        const result = await supabase.from('tasks').update({
+                if (task.id && !task._delete) {
+                    // Verificar si la tarea existe realmente
+                    const { data: existingTask } = await supabase
+                        .from('tasks')
+                        .select('id')
+                        .eq('id', task.id)
+                        .eq('user_id', userId)
+                        .single();
+                    
+                    if (existingTask) {
+                        // Update existing task
+                        console.log("Updating existing task:", task.id);
+                        await supabase.from('tasks').update({
                             title: task.title,
                             category: task.category
                         }).eq('id', task.id).eq('user_id', userId);
-                        console.log("Task update result:", result);
+                    } else {
+                        // ID no existe, crear nueva tarea
+                        console.log("ID invented, creating new task:", task.title);
+                        await supabase.from('tasks').insert({
+                            user_id: userId,
+                            title: task.title,
+                            category: task.category || 'General',
+                            isCompleted: task.isCompleted || false
+                        });
                     }
+                } else if (task.id && task._delete) {
+                    // Delete
+                    console.log("Deleting task:", task.id);
+                    await supabase.from('tasks').delete().eq('id', task.id).eq('user_id', userId);
                 } else if (!task._delete && task.title) {
-                    // Insert new
+                    // Insert new task (no ID provided)
                     console.log("Inserting new task:", task.title, "for user:", userId);
                     const result = await supabase.from('tasks').insert({
                         user_id: userId,
