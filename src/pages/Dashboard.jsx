@@ -5,11 +5,10 @@ import { useStore } from '../store/useStore';
 import { processBrainDumpAsJSON } from '../lib/gemini';
 import { 
   LogOut, CloudLightning, Loader2, Sparkles, AlertCircle,
-  Home, ListTodo, Calendar, Lightbulb, MapPin, Settings, BrainCircuit,
-  ChevronDown, ChevronUp, Plus, CheckCircle2, Circle, Trash2, X
+  Home, ListTodo, Calendar, Lightbulb, Settings, BrainCircuit,
+  CheckCircle2, Circle, Trash2, X, TrendingUp, MapPin, Archive, Plus
 } from 'lucide-react';
 import { useTranslation } from '../lib/i18n';
-import WeeklyRecap from '../components/WeeklyRecap';
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
@@ -19,8 +18,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  const [activeTab, setActiveTab] = useState('home');
-  const [expandedSections, setExpandedSections] = useState({ tasks: true, reminders: true });
+  const [activeTab, setActiveTab] = useState('tasks');
   
   const { t } = useTranslation();
   
@@ -51,7 +49,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 80)}px`;
+      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 50)}px`;
     }
   }, [text]);
 
@@ -82,10 +80,6 @@ export default function Dashboard() {
     }
   };
 
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
-
   const groupedTasks = tasks.reduce((acc, task) => {
     const cat = task.category || 'General';
     if (!acc[cat]) acc[cat] = [];
@@ -94,6 +88,8 @@ export default function Dashboard() {
   }, {});
 
   const categories = Object.keys(groupedTasks);
+  const pendingTasks = tasks.filter(t => !t.isCompleted);
+  const completedTasks = tasks.filter(t => t.isCompleted);
 
   const formatReminderDate = (isoString) => {
     try {
@@ -110,424 +106,433 @@ export default function Dashboard() {
     }
   };
 
+  const getCurrentMonth = () => {
+    return new Date().toLocaleDateString('es', { month: 'long', year: 'numeric' });
+  };
+
+  const getMonthDays = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const days = [];
+    
+    for (let i = 0; i < firstDay.getDay(); i++) {
+      days.push({ day: null, date: null });
+    }
+    
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+      const date = new Date(year, month, i);
+      days.push({ 
+        day: i, 
+        date: date.toISOString(),
+        isToday: date.toDateString() === today.toDateString(),
+        hasReminder: reminders.some(r => new Date(r.date).toDateString() === date.toDateString())
+      });
+    }
+    
+    return days;
+  };
+
+  const monthDays = getMonthDays();
+  const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
   const tabs = [
-    { id: 'home', label: 'Inicio', icon: Home },
     { id: 'tasks', label: 'Tareas', icon: ListTodo },
-    { id: 'calendar', label: 'Fechas', icon: Calendar },
-    { id: 'ideas', label: 'Ideas', icon: Lightbulb },
+    { id: 'calendar', label: 'Calendario', icon: Calendar },
+    { id: 'notes', label: 'Notas', icon: Archive },
+    { id: 'map', label: 'Mapa', icon: MapPin },
+    { id: 'stats', label: 'Stats', icon: TrendingUp },
   ];
 
+  // Calculate map center
+  const mapCenter = locations.length > 0 
+    ? { lat: locations[locations.length - 1].lat, lng: locations[locations.length - 1].lng }
+    : { lat: 40.4168, lng: -3.7038 }; // Madrid default
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col text-gray-900 dark:text-gray-100">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/30">
-              <CloudLightning className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-lg bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent">BrainDump</span>
+      <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+            <CloudLightning className="w-4 h-4 text-white" />
           </div>
-          
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setActiveTab('settings')}
-              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
-            <button 
-              onClick={handleLogout}
-              className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-            >
-              <LogOut className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
-          </div>
+          <span className="font-semibold text-base">BrainDump</span>
+        </div>
+        
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={handleLogout}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            <LogOut className="w-5 h-5 text-gray-500" />
+          </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 pb-20 px-3 sm:px-4 max-w-2xl mx-auto w-full">
+      <main className="flex-1 px-4 pb-24 max-w-lg mx-auto w-full overflow-y-auto">
         
         {/* Input Section */}
-        <div className="mt-4 mb-6">
-          <div className={`relative transition-all duration-300 rounded-2xl overflow-hidden
-              ${isFocused ? 'ring-2 ring-brand-500/30' : ''}
-              ${error ? 'ring-2 ring-red-500/30' : ''}
-          `}>
-            <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50">
-              <textarea
-                ref={textareaRef}
-                value={text}
-                onChange={(e) => {
-                    setText(e.target.value);
-                    if(error) setError('');
-                }}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder="¿Qué tienes en mente? Escribe todo lo que necesites hacer, recordar o planificar..."
-                className="w-full bg-transparent text-base text-gray-800 dark:text-gray-200 placeholder-gray-400 resize-none outline-none p-4 min-h-[100px]"
-                disabled={isLoading}
-              />
-              
-              {error && (
-                  <div className="px-4 pb-2 text-xs text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3"/> {error}
-                  </div>
-              )}
-
-              <div className="flex items-center justify-between px-4 pb-3">
-                <span className="text-xs text-gray-400 hidden sm:block">La IA organizará todo por ti</span>
-                <button
-                  onClick={handleOrganize}
-                  disabled={isLoading || !text.trim()}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all
-                      ${isLoading || !text.trim()
-                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed' 
-                      : 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:scale-[1.02] active:scale-[0.98]'
-                      }
-                  `}
-                >
-                  {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                      <Sparkles className="w-4 h-4" />
-                  )}
-                  <span>Organizar</span>
-                </button>
+        <div className="sticky top-[57px] z-40 pt-2 pb-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg -mx-4 px-4">
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={(e) => {
+                setText(e.target.value);
+                if(error) setError('');
+            }}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder="¿Qué tienes en mente? Escríbelo todo..."
+            className={`w-full text-sm resize-none outline-none p-2.5 min-h-[50px] rounded-lg transition-all
+                ${isFocused ? 'ring-2 ring-brand-500/50' : ''}
+                ${error ? 'ring-2 ring-red-500/50' : ''}
+                bg-gray-100 dark:bg-gray-800
+            `}
+            disabled={isLoading}
+          />
+          
+          {error && (
+              <div className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3"/> {error}
               </div>
+          )}
+
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-20 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-brand-500 rounded-full transition-all"
+                  style={{ width: `${stats.totalCount > 0 ? (stats.completedCount / stats.totalCount) * 100 : 0}%` }}
+                />
+              </div>
+              <span className="text-xs text-gray-500">{stats.completedCount}/{stats.totalCount}</span>
             </div>
+            
+            <button
+              onClick={handleOrganize}
+              disabled={isLoading || !text.trim()}
+              className={`px-3 py-1.5 rounded-lg font-medium text-xs transition-all
+                  ${isLoading || !text.trim()
+                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed' 
+                  : 'bg-brand-500 text-white'
+                  }
+              `}
+            >
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Organizar'}
+            </button>
           </div>
         </div>
 
-        {/* Stats Summary */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-brand-400 to-brand-600 rounded-full transition-all duration-500"
-                style={{ width: `${stats.totalCount > 0 ? (stats.completedCount / stats.totalCount) * 100 : 0}%` }}
-              />
-            </div>
-            <span className="text-xs font-medium text-gray-500 whitespace-nowrap">
-              {stats.completedCount}/{stats.totalCount} tareas
-            </span>
-          </div>
-        </div>
-
-        {/* Weekly Recap Mini */}
-        <div className="mb-6 p-4 bg-gradient-to-r from-brand-50 to-emerald-50 dark:from-brand-900/30 dark:to-emerald-900/30 rounded-2xl border border-brand-200/50 dark:border-brand-700/30">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-brand-700 dark:text-brand-300 uppercase tracking-wide">Esta semana</span>
-            <span className="text-lg font-bold text-brand-600 dark:text-brand-400">{stats.completionRate || 0}%</span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {stats.completedThisWeek > 0 
-              ? `Has completado ${stats.completedThisWeek} de ${stats.totalThisWeek} tareas esta semana`
-              : stats.totalThisWeek > 0 
-                ? '¡Vamos! Completa al menos una tarea hoy'
-                : 'Escribe tus tareas arriba para empezar'
-            }
-          </p>
-        </div>
-
-        {/* Content by Tab */}
-        {activeTab === 'home' && (
-          <div className="space-y-4">
-            {/* Upcoming Reminders */}
-            {reminders.length > 0 && (
-              <section className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
-                <button 
-                  onClick={() => toggleSection('reminders')}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
-                      <Calendar className="w-4 h-4 text-red-600 dark:text-red-400" />
-                    </div>
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">Próximos eventos</span>
-                    <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">{reminders.length}</span>
-                  </div>
-                  {expandedSections.reminders ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
-                </button>
-                
-                {expandedSections.reminders && (
-                  <div className="px-4 pb-4 space-y-2">
-                    {reminders.slice(0, 5).map(reminder => (
-                      <div key={reminder.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{reminder.title}</span>
-                        </div>
-                        <span className="text-xs text-gray-500">{formatReminderDate(reminder.date)}</span>
-                      </div>
-                    ))}
-                    {reminders.length > 5 && (
-                      <button onClick={() => setActiveTab('calendar')} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
-                        Ver todos ({reminders.length})
-                      </button>
-                    )}
-                  </div>
-                )}
-              </section>
-            )}
-
-            {/* AI Suggestions */}
-            {suggestions.length > 0 && (
-              <section className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
-                    <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">Consejos</span>
-                </div>
-                <div className="space-y-2">
-                  {suggestions.slice(0, 3).map(sugg => (
-                    <p key={sugg.id} className="text-sm text-gray-600 dark:text-gray-400 italic">"{sugg.text}"</p>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Quick Tasks */}
-            {tasks.length > 0 && (
-              <section className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
-                <button 
-                  onClick={() => toggleSection('tasks')}
-                  className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-brand-100 dark:bg-brand-900/30 rounded-lg flex items-center justify-center">
-                      <ListTodo className="w-4 h-4 text-brand-600 dark:text-brand-400" />
-                    </div>
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">Tareas</span>
-                    <span className="text-xs bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 px-2 py-0.5 rounded-full">{tasks.length}</span>
-                  </div>
-                  {expandedSections.tasks ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
-                </button>
-                
-                {expandedSections.tasks && (
-                  <div className="px-4 pb-4 space-y-2">
-                    {tasks.slice(0, 6).map(task => (
-                      <div 
-                        key={task.id} 
-                        onClick={() => toggleTaskStatus(currentUser.id, task.id, task.isCompleted)}
-                        className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                      >
-                        {task.isCompleted ? (
-                          <CheckCircle2 className="w-5 h-5 text-brand-500 flex-shrink-0" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-gray-300 dark:text-gray-600 flex-shrink-0" />
-                        )}
-                        <span className={`text-sm ${task.isCompleted ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
-                          {task.title}
-                        </span>
-                      </div>
-                    ))}
-                    {tasks.length > 6 && (
-                      <button onClick={() => setActiveTab('tasks')} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
-                        Ver todas ({tasks.length})
-                      </button>
-                    )}
-                  </div>
-                )}
-              </section>
-            )}
-          </div>
-        )}
-
-        {/* Tasks Tab */}
+        {/* ===================== TAREA TAB ===================== */}
         {activeTab === 'tasks' && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Todas las tareas</h2>
-            
-            {categories.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <ListTodo className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No hay tareas todavía</p>
-                <p className="text-sm mt-1">Escribe arriba para crear una</p>
-              </div>
-            ) : (
-              categories.map(category => (
-                <div key={category} className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
-                  <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200/50 dark:border-gray-700/50">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{category}</span>
-                  </div>
-                  <div className="divide-y divide-gray-100 dark:divide-gray-800">
-                    {groupedTasks[category].map(task => (
-                      <div 
-                        key={task.id} 
-                        className="flex items-center gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                      >
-                        <button 
-                          onClick={() => toggleTaskStatus(currentUser.id, task.id, task.isCompleted)}
-                          className="flex-shrink-0"
-                        >
-                          {task.isCompleted ? (
-                            <CheckCircle2 className="w-5 h-5 text-brand-500" />
-                          ) : (
-                            <Circle className="w-5 h-5 text-gray-300 dark:text-gray-600" />
-                          )}
-                        </button>
-                        <span className={`flex-1 ${task.isCompleted ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
-                          {task.title}
-                        </span>
-                        <button 
-                          onClick={() => deleteTask(currentUser.id, task.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Calendar Tab */}
-        {activeTab === 'calendar' && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Fechas importantes</h2>
-            
-            {reminders.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No hay eventos programados</p>
-                <p className="text-sm mt-1">La IA detectará fechas de tu texto</p>
-              </div>
-            ) : (
-              reminders.map(reminder => (
-                <div 
-                  key={reminder.id}
-                  className="flex items-center gap-4 p-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50"
-                >
-                  <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex flex-col items-center justify-center">
-                    <span className="text-xs font-bold text-red-600 dark:text-red-400">
-                      {new Date(reminder.date).getDate()}
-                    </span>
-                    <span className="text-[10px] text-red-500 uppercase">
-                      {new Date(reminder.date).toLocaleDateString('es', { month: 'short' })}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-800 dark:text-gray-200">{reminder.title}</p>
-                    <p className="text-xs text-gray-500">{formatReminderDate(reminder.date)}</p>
-                  </div>
-                  <button 
-                    onClick={() => deleteReminder(currentUser.id, reminder.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            <div className="py-2">
+              <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Por hacer ({pendingTasks.length})</h2>
+              {pendingTasks.length === 0 ? (
+                <p className="text-sm text-gray-400 py-2">¡No hay tareas pendientes!</p>
+              ) : (
+                pendingTasks.map(task => (
+                  <div 
+                    key={task.id} 
+                    className="flex items-center gap-2 py-2 group"
                   >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Ideas Tab */}
-        {activeTab === 'ideas' && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Ideas y sugerencias</h2>
-            
-            {suggestions.length === 0 && memories.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No hay sugerencias todavía</p>
-                <p className="text-sm mt-1">La IA te dará consejos basados en tus tareas</p>
-              </div>
-            ) : (
-              <>
-                {suggestions.length > 0 && (
-                  <div className="space-y-3 mb-6">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Consejos de IA</h3>
-                    {suggestions.map(sugg => (
-                      <div 
-                        key={sugg.id}
-                        className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-200/50 dark:border-amber-700/30"
-                      >
-                        <div className="flex items-start gap-3">
-                          <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-amber-800 dark:text-amber-200">{sugg.text}</p>
-                        </div>
-                      </div>
-                    ))}
+                    <button 
+                      onClick={() => toggleTaskStatus(currentUser.id, task.id, task.isCompleted)}
+                      className="flex-shrink-0"
+                    >
+                      <Circle className="w-5 h-5 text-gray-300 hover:text-brand-500" />
+                    </button>
+                    <span className="flex-1 text-sm">{task.title}</span>
+                    <button 
+                      onClick={() => deleteTask(currentUser.id, task.id)}
+                      className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                )}
-
-                {memories.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Notas guardadas</h3>
-                    {memories.map(mem => (
-                      <div 
-                        key={mem.id}
-                        className="p-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-start gap-3">
-                            <BrainCircuit className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-gray-700 dark:text-gray-300">{mem.text}</p>
-                          </div>
-                          <button 
-                            onClick={() => deleteMemory(currentUser.id, mem.id)}
-                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Settings Placeholder */}
-        {activeTab === 'settings' && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Configuración</h2>
-            
-            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-4">
-              <p className="text-sm text-gray-500 mb-2">Cuenta</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{currentUser?.email}</p>
+                ))
+              )}
             </div>
 
-            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-4">
-              <p className="text-sm text-gray-500">Cerrar sesión</p>
-              <button 
-                onClick={handleLogout}
-                className="mt-2 text-red-600 dark:text-red-400 font-medium text-sm hover:underline"
-              >
-                Cerrar sesión
-              </button>
+            {completedTasks.length > 0 && (
+              <div className="py-2">
+                <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Completadas ({completedTasks.length})</h2>
+                {completedTasks.slice(0, 5).map(task => (
+                  <div 
+                    key={task.id} 
+                    className="flex items-center gap-2 py-2 opacity-50 group"
+                  >
+                    <button 
+                      onClick={() => toggleTaskStatus(currentUser.id, task.id, task.isCompleted)}
+                      className="flex-shrink-0"
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-brand-500" />
+                    </button>
+                    <span className="flex-1 text-sm line-through">{task.title}</span>
+                    <button 
+                      onClick={() => deleteTask(currentUser.id, task.id)}
+                      className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ===================== CALENDAR TAB ===================== */}
+        {activeTab === 'calendar' && (
+          <div className="space-y-4">
+            <div className="py-2">
+              <h2 className="text-sm font-medium mb-3 capitalize">{getCurrentMonth()}</h2>
+              
+              <div className="grid grid-cols-7 gap-1 text-center">
+                {weekDays.map(day => (
+                  <div key={day} className="text-[10px] font-medium text-gray-400 py-1">{day}</div>
+                ))}
+                
+                {monthDays.map((d, i) => (
+                  <div 
+                    key={i} 
+                    className={`text-xs py-1.5 rounded flex items-center justify-center
+                      ${d.isToday ? 'bg-brand-500 text-white font-bold' : ''}
+                      ${d.hasReminder && !d.isToday ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : ''}
+                    `}
+                  >
+                    {d.day}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="py-2">
+              <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Próximos eventos</h2>
+              {reminders.length === 0 ? (
+                <p className="text-sm text-gray-400 py-2">No hay eventos programados</p>
+              ) : (
+                reminders.map(reminder => (
+                  <div 
+                    key={reminder.id}
+                    className="flex items-center gap-3 py-2 group"
+                  >
+                    <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex flex-col items-center justify-center">
+                      <span className="text-xs font-bold text-red-600 dark:text-red-400">
+                        {new Date(reminder.date).getDate()}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm">{reminder.title}</p>
+                      <p className="text-xs text-gray-500">{formatReminderDate(reminder.date)}</p>
+                    </div>
+                    <button 
+                      onClick={() => deleteReminder(currentUser.id, reminder.id)}
+                      className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===================== NOTES TAB ===================== */}
+        {activeTab === 'notes' && (
+          <div className="space-y-4">
+            <div className="py-2">
+              <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Notas importantes</h2>
+              {memories.length === 0 ? (
+                <div className="py-4 text-center">
+                  <BrainCircuit className="w-8 h-8 mx-auto text-gray-300 mb-2" />
+                  <p className="text-sm text-gray-400">No hay notas guardadas</p>
+                </div>
+              ) : (
+                memories.map(mem => (
+                  <div 
+                    key={mem.id}
+                    className="flex items-start gap-2 py-2 group"
+                  >
+                    <BrainCircuit className="w-4 h-4 text-indigo-500 flex-shrink-0 mt-1" />
+                    <p className="flex-1 text-sm">{mem.text}</p>
+                    <button 
+                      onClick={() => deleteMemory(currentUser.id, mem.id)}
+                      className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {suggestions.length > 0 && (
+              <div className="py-2">
+                <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Sugerencias</h2>
+                {suggestions.map(sugg => (
+                  <div key={sugg.id} className="py-2">
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{sugg.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ===================== MAP TAB ===================== */}
+        {activeTab === 'map' && (
+          <div className="space-y-4">
+            <div className="py-2">
+              <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Ubicaciones ({locations.length})</h2>
+              
+              {locations.length === 0 ? (
+                <div className="py-8 text-center">
+                  <MapPin className="w-10 h-10 mx-auto text-gray-300 mb-3" />
+                  <p className="text-sm text-gray-400 mb-1">No hay ubicaciones</p>
+                  <p className="text-xs text-gray-500">Escribe nombres de lugares en el cuadro de arriba</p>
+                  <p className="text-xs text-gray-500 mt-1">Ej: "Voy a Madrid", "Tengo reunión en Barcelona"</p>
+                </div>
+              ) : (
+                <>
+                  {/* Mini Map */}
+                  <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-4 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <a 
+                        href={`https://www.openstreetmap.org/?mlat=${mapCenter.lat}&mlon=${mapCenter.lng}#map=5/${mapCenter.lat}/${mapCenter.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full h-full flex items-center justify-center bg-cover bg-center"
+                        style={{
+                          backgroundImage: `url(https://tile.openstreetmap.org/5/${Math.floor((mapCenter.lng + 180) / 360 * Math.pow(2, 5))}/${Math.floor((90 - mapCenter.lat) / 180 * Math.pow(2, 5))}/5.png)`,
+                          backgroundSize: 'cover'
+                        }}
+                      >
+                        <div className="bg-white/90 dark:bg-gray-900/90 px-3 py-1.5 rounded-full text-xs font-medium">
+                          Abrir en OpenStreetMap ↗
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Location List */}
+                  <div className="space-y-2">
+                    {locations.map((loc, index) => (
+                      <div 
+                        key={loc.id || index}
+                        className="flex items-center gap-3 py-2 group"
+                      >
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                          <MapPin className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{loc.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {loc.lat?.toFixed(4)}, {loc.lng?.toFixed(4)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===================== STATS TAB ===================== */}
+        {activeTab === 'stats' && (
+          <div className="space-y-4">
+            <div className="py-4 text-center">
+              <div className="relative w-24 h-24 mx-auto mb-3">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    className="text-gray-200 dark:text-gray-700"
+                    strokeWidth="3"
+                    stroke="currentColor"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    className="text-brand-500"
+                    strokeWidth="3"
+                    strokeDasharray={`${stats.totalCount > 0 ? (stats.completedCount / stats.totalCount) * 100 : 0}, 100`}
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold">
+                    {stats.totalCount > 0 ? Math.round((stats.completedCount / stats.totalCount) * 100) : 0}%
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Progreso total</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-brand-500">{tasks.length}</p>
+                <p className="text-xs text-gray-500">Total</p>
+              </div>
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-green-500">{stats.completedCount}</p>
+                <p className="text-xs text-gray-500">Hechas</p>
+              </div>
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-amber-500">{pendingTasks.length}</p>
+                <p className="text-xs text-gray-500">Pendientes</p>
+              </div>
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-red-500">{reminders.length}</p>
+                <p className="text-xs text-gray-500">Eventos</p>
+              </div>
+            </div>
+
+            <div className="py-2">
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Esta semana</span>
+                  <span className="text-sm font-medium">{stats.completedThisWeek} / {stats.totalThisWeek}</span>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-brand-500 rounded-full transition-all"
+                    style={{ width: `${stats.completionRate || 0}%` }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 safe-area-pb z-50">
-        <div className="flex items-center justify-around px-2 py-2 max-w-2xl mx-auto">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-                activeTab === tab.id 
-                  ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30' 
-                  : 'text-gray-500 dark:text-gray-400'
-              }`}
-            >
-              <tab.icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium">{tab.label}</span>
-            </button>
-          ))}
-        </div>
+      <nav className="fixed bottom-0 left-0 right-0 px-1 py-1 flex items-center justify-around border-t border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg z-50">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors ${
+              activeTab === tab.id 
+                ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20' 
+                : 'text-gray-400'
+            }`}
+          >
+            <tab.icon className="w-5 h-5" />
+            <span className="text-[9px]">{tab.label}</span>
+          </button>
+        ))}
       </nav>
     </div>
   );
