@@ -198,22 +198,29 @@ export const useStore = create(persist((set, get) => ({
             for (const task of parsedData.tasks) {
                 if (task.id) {
                     // Update or Delete existing
+                    console.log("Updating task:", task.id);
                     if (task._delete) {
                         await supabase.from('tasks').delete().eq('id', task.id).eq('user_id', userId);
                     } else {
-                        await supabase.from('tasks').update({
+                        const result = await supabase.from('tasks').update({
                             title: task.title,
                             category: task.category
                         }).eq('id', task.id).eq('user_id', userId);
+                        console.log("Task update result:", result);
                     }
                 } else if (!task._delete && task.title) {
                     // Insert new
-                    await supabase.from('tasks').insert({
+                    console.log("Inserting new task:", task.title, "for user:", userId);
+                    const result = await supabase.from('tasks').insert({
                         user_id: userId,
                         title: task.title,
                         category: task.category || 'General',
                         isCompleted: false
                     });
+                    console.log("Task insert result:", result);
+                    if (result.error) {
+                        console.error("Error inserting task:", result.error);
+                    }
                 }
             }
         }
