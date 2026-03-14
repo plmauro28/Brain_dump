@@ -188,7 +188,7 @@ export default function Dashboard() {
       <main className="flex-1 px-4 pb-24 max-w-lg mx-auto w-full overflow-y-auto">
         
         {/* Input Section */}
-        <div className="sticky top-[57px] z-40 pt-2 pb-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg -mx-4 px-4">
+        <div className="sticky top-[57px] z-40 pt-3 pb-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg -mx-4 px-4 mb-4 border-b border-gray-100 dark:border-gray-800">
           <textarea
             ref={textareaRef}
             value={text}
