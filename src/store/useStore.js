@@ -180,14 +180,21 @@ export const useStore = create(persist((set, get) => ({
 
   // Inyectar resultados de la IA a Supabase
   saveAiResults: async (userId, rawText, parsedData) => {
-    if (!userId) return;
+    if (!userId) {
+      console.error("No userId provided");
+      return;
+    }
+
+    console.log("saveAiResults called with:", { userId, parsedData });
 
     try {
         // 1. Guardar el dump (historial conversacional)
-        await supabase.from('dumps').insert({ user_id: userId, text: rawText });
+        const dumpResult = await supabase.from('dumps').insert({ user_id: userId, text: rawText });
+        console.log("Dump saved:", dumpResult);
 
         // Procesar Tareas
         if (parsedData.tasks && Array.isArray(parsedData.tasks)) {
+            console.log("Processing tasks:", parsedData.tasks);
             for (const task of parsedData.tasks) {
                 if (task.id) {
                     // Update or Delete existing

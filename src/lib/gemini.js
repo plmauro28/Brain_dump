@@ -107,10 +107,13 @@ export async function processBrainDumpAsJSON(text, existingContext = {}) {
     });
 
     const content = completion.choices[0].message.content;
+    console.log("AI Raw Response:", content);
     
     try {
         const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        console.log("AI Cleaned Response:", cleanContent);
         const parsedData = JSON.parse(cleanContent);
+        console.log("AI Parsed Data:", parsedData);
         
         // Geocode locations
         if (parsedData.locations && Array.isArray(parsedData.locations)) {

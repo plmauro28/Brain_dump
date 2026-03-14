@@ -63,7 +63,10 @@ export default function Dashboard() {
   }
 
   const handleOrganize = async () => {
-    if (!text.trim() || !currentUser?.id) return;
+    if (!text.trim() || !currentUser?.id) {
+      console.log("No text or no user");
+      return;
+    }
     
     setIsLoading(true);
     setError('');
@@ -72,12 +75,18 @@ export default function Dashboard() {
         console.log("Processing brain dump...");
         const jsonData = await processBrainDumpAsJSON(text, { tasks, reminders });
         console.log("AI Response:", jsonData);
+        
+        if (!jsonData) {
+          throw new Error("La IA no devolvió datos");
+        }
+        
+        console.log("Saving to database...");
         await saveAiResults(currentUser.id, text, jsonData);
         console.log("Saved successfully!");
         setText('');
     } catch (err) {
         console.error("Error organizing:", err);
-        setError(err.message || "Error procesando. Revisa la consola para más detalles.");
+        setError(err.message || "Error procesando. Revisa la consola.");
     } finally {
         setIsLoading(false);
     }
