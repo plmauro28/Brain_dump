@@ -2,8 +2,10 @@ import OpenAI from "openai";
 
 const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
+    console.log("GROQ API Key loaded:", API_KEY ? "YES - " + API_KEY.substring(0, 10) + "..." : "NO");
+
 if (!API_KEY) {
-  console.warn("VITE_GROQ_API_KEY is missing. Please set it in your .env file.");
+  console.warn("VITE_GROQ_API_KEY is missing. Please set it in your .env file or Vercel.");
 }
 
 const openai = new OpenAI({
@@ -79,8 +81,9 @@ async function geocodeLocation(locationName) {
 }
 
 export async function processBrainDumpAsJSON(text, existingContext = {}) {
-  if (!API_KEY) {
-    throw new Error("API Key faltante.");
+  if (!API_KEY || API_KEY === "missing_key") {
+    console.error("API Key missing or invalid:", API_KEY);
+    throw new Error("API Key no configurada. Añade VITE_GROQ_API_KEY en Vercel.");
   }
 
   const { tasks = [], reminders = [], memories = [] } = existingContext;

@@ -69,12 +69,15 @@ export default function Dashboard() {
     setError('');
     
     try {
+        console.log("Processing brain dump...");
         const jsonData = await processBrainDumpAsJSON(text, { tasks, reminders });
+        console.log("AI Response:", jsonData);
         await saveAiResults(currentUser.id, text, jsonData);
+        console.log("Saved successfully!");
         setText('');
     } catch (err) {
-        console.error(err);
-        setError(err.message || "Error procesando.");
+        console.error("Error organizing:", err);
+        setError(err.message || "Error procesando. Revisa la consola para más detalles.");
     } finally {
         setIsLoading(false);
     }
