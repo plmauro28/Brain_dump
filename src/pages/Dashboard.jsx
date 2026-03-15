@@ -165,10 +165,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex flex-col text-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
+      {/* Header - Invisible */}
+      <header className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center shadow-lg shadow-brand-500/30">
             <CloudLightning className="w-4 h-4 text-white" />
           </div>
           <span className="font-semibold text-base">BrainDump</span>
@@ -177,9 +177,9 @@ export default function Dashboard() {
         <div className="flex items-center gap-1">
           <button 
             onClick={handleLogout}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-2 rounded-lg hover:bg-white/20 dark:hover:bg-gray-800/50 transition-colors"
           >
-            <LogOut className="w-5 h-5 text-gray-500" />
+            <LogOut className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
         </div>
       </header>
@@ -187,9 +187,10 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 px-4 pb-24 max-w-lg mx-auto w-full overflow-y-auto">
         
-        {/* Input Section */}
-        <div className="sticky top-[57px] z-40 pt-3 pb-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg -mx-4 px-4 mb-4 border-b border-gray-100 dark:border-gray-800">
-          <textarea
+        {/* Input Section - Liquid Glass */}
+        <div className="sticky top-[52px] z-40 pt-3 pb-4 -mx-4 px-4 mb-4">
+          <div className="glass-panel rounded-2xl p-1">
+            <textarea
             ref={textareaRef}
             value={text}
             onChange={(e) => {
@@ -199,10 +200,9 @@ export default function Dashboard() {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder="¿Qué tienes en mente? Escríbelo todo..."
-            className={`w-full text-sm resize-none outline-none p-2.5 min-h-[50px] rounded-lg transition-all
+            className={`w-full text-sm resize-none outline-none p-2.5 min-h-[50px] bg-transparent transition-all
                 ${isFocused ? 'ring-2 ring-brand-500/50' : ''}
                 ${error ? 'ring-2 ring-red-500/50' : ''}
-                bg-gray-100 dark:bg-gray-800
             `}
             disabled={isLoading}
           />
@@ -227,10 +227,10 @@ export default function Dashboard() {
             <button
               onClick={handleOrganize}
               disabled={isLoading || !text.trim()}
-              className={`px-3 py-1.5 rounded-lg font-medium text-xs transition-all
+              className={`px-4 py-2 rounded-xl font-medium text-sm transition-all shadow-lg
                   ${isLoading || !text.trim()
-                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed' 
-                  : 'bg-brand-500 text-white'
+                  ? 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-400 cursor-not-allowed' 
+                  : 'bg-brand-500/90 text-white hover:bg-brand-600/90 shadow-brand-500/30'
                   }
               `}
             >
@@ -238,9 +238,11 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
+        </div>
 
-        {/* ===================== TAREA TAB ===================== */}
-        {activeTab === 'tasks' && (
+        {/* Tabs Content */}
+        <div className="space-y-4">
+          {activeTab === 'tasks' && (
           <div className="space-y-4">
             <div className="py-2">
               <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Por hacer ({pendingTasks.length})</h2>
@@ -423,10 +425,10 @@ export default function Dashboard() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full h-full flex items-center justify-center bg-cover bg-center"
-                        style={{
-                          backgroundImage: `url(https://tile.openstreetmap.org/5/${Math.floor((mapCenter.lng + 180) / 360 * Math.pow(2, 5))}/${Math.floor((90 - mapCenter.lat) / 180 * Math.pow(2, 5))}/5.png)`,
-                          backgroundSize: 'cover'
-                        }}
+style={{
+  backgroundImage: 'url(https://tile.openstreetmap.org/5/' + Math.floor((mapCenter.lng + 180) / 360 * Math.pow(2, 5)) + '/' + Math.floor((90 - mapCenter.lat) / 180 * Math.pow(2, 5)) + '/5.png)',
+  backgroundSize: 'cover'
+}}
                       >
                         <div className="bg-white/90 dark:bg-gray-900/90 px-3 py-1.5 rounded-full text-xs font-medium">
                           Abrir en OpenStreetMap ↗
@@ -526,19 +528,20 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        )}
+          )}
+        </div>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 px-1 py-1 flex items-center justify-around border-t border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg z-50">
+      {/* Bottom Navigation - Liquid Glass */}
+      <nav className="fixed bottom-0 left-0 right-0 px-1 py-1 flex items-center justify-around glass-panel border-t-0 z-50">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors ${
+            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
               activeTab === tab.id 
-                ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20' 
-                : 'text-gray-400'
+                ? 'text-brand-600 dark:text-brand-400 bg-brand-500/20' 
+                : 'text-gray-500 dark:text-gray-400'
             }`}
           >
             <tab.icon className="w-5 h-5" />

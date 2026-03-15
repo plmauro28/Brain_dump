@@ -181,13 +181,13 @@
     @apply bg-gray-300 dark:bg-gray-700 rounded-full;
   }
   
-  /* Glassmorphism - minimal, unified look */
+  /* Liquid Glass */
   .glass-panel {
-    @apply bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-0;
+    @apply bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl border border-white/20 dark:border-white/10;
   }
   
   .glass-card {
-    @apply bg-white/50 dark:bg-gray-800/50 backdrop-blur-md border-0;
+    @apply bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/10 dark:border-white/5;
   }
 }
 
