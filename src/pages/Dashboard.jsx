@@ -6,7 +6,7 @@ import { processBrainDumpAsJSON } from '../lib/gemini';
 import { 
   LogOut, CloudLightning, Loader2, Sparkles, AlertCircle,
   Home, ListTodo, Calendar, Lightbulb, Settings, BrainCircuit,
-  CheckCircle2, Circle, Trash2, X, TrendingUp, MapPin, Archive, Plus
+  CheckCircle2, Circle, Trash2, X, TrendingUp, MapPin, Archive, Plus, Bell
 } from 'lucide-react';
 import { useTranslation } from '../lib/i18n';
 
@@ -154,7 +154,7 @@ export default function Dashboard() {
     { id: 'tasks', label: 'Tareas', icon: ListTodo },
     { id: 'calendar', label: 'Calendario', icon: Calendar },
     { id: 'notes', label: 'Notas', icon: Archive },
-    { id: 'map', label: 'Mapa', icon: MapPin },
+    { id: 'settings', label: 'Ajustes', icon: Settings },
     { id: 'stats', label: 'Stats', icon: TrendingUp },
   ];
 
@@ -402,62 +402,80 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ===================== MAP TAB ===================== */}
-        {activeTab === 'map' && (
+        {/* ===================== SETTINGS TAB ===================== */}
+        {activeTab === 'settings' && (
           <div className="space-y-4">
             <div className="py-2">
-              <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Ubicaciones ({locations.length})</h2>
+              <h2 className="text-xs font-medium text-gray-500 uppercase mb-2">Ajustes</h2>
               
-              {locations.length === 0 ? (
-                <div className="py-8 text-center">
-                  <MapPin className="w-10 h-10 mx-auto text-gray-300 mb-3" />
-                  <p className="text-sm text-gray-400 mb-1">No hay ubicaciones</p>
-                  <p className="text-xs text-gray-500">Escribe nombres de lugares en el cuadro de arriba</p>
-                  <p className="text-xs text-gray-500 mt-1">Ej: "Voy a Madrid", "Tengo reunión en Barcelona"</p>
-                </div>
-              ) : (
-                <>
-                  {/* Mini Map */}
-                  <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-4 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <a 
-                        href={`https://www.openstreetmap.org/?mlat=${mapCenter.lat}&mlon=${mapCenter.lng}#map=5/${mapCenter.lat}/${mapCenter.lng}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full h-full flex items-center justify-center bg-cover bg-center"
-style={{
-  backgroundImage: 'url(https://tile.openstreetmap.org/5/' + Math.floor((mapCenter.lng + 180) / 360 * Math.pow(2, 5)) + '/' + Math.floor((90 - mapCenter.lat) / 180 * Math.pow(2, 5)) + '/5.png)',
-  backgroundSize: 'cover'
-}}
-                      >
-                        <div className="bg-white/90 dark:bg-gray-900/90 px-3 py-1.5 rounded-full text-xs font-medium">
-                          Abrir en OpenStreetMap ↗
-                        </div>
-                      </a>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Settings className="w-5 h-5 text-brand-500" />
+                    <div>
+                      <p className="font-medium">Tema</p>
+                      <p className="text-sm text-gray-500">Claro/Oscuro según sistema</p>
                     </div>
                   </div>
-
-                  {/* Location List */}
-                  <div className="space-y-2">
-                    {locations.map((loc, index) => (
-                      <div 
-                        key={loc.id || index}
-                        className="flex items-center gap-3 py-2 group"
-                      >
-                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                          <MapPin className="w-4 h-4 text-green-600 dark:text-green-400" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{loc.name}</p>
-                          <p className="text-xs text-gray-500">
-                            {loc.lat?.toFixed(4)}, {loc.lng?.toFixed(4)}
-                          </p>
-                        </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" />
+                      <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-500">
+                        <div className="absolute inset-0.5 h-5 w-5 bg-white rounded-full shadow peer-checked:translate-x-5 peer-checked:bg-brand-500 transition-transform"></div>
                       </div>
-                    ))}
+                    </label>
                   </div>
-                </>
-              )}
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-5 h-5 text-brand-500" />
+                    <div>
+                      <p className="font-medium">Notificaciones</p>
+                      <p className="text-sm text-gray-500">Recordatorios y sugerencias</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" checked />
+                      <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-500">
+                        <div className="absolute inset-0.5 h-5 w-5 bg-white rounded-full shadow peer-checked:translate-x-5 peer-checked:bg-brand-500 transition-transform"></div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                    <div>
+                      <p className="font-medium">Eliminar datos</p>
+                      <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if (window.confirm('¿Estás seguro de que quieres eliminar todos los datos? Esta acción no se puede deshacer.')) {
+                        // TODO: Implement actual data deletion
+                        alert('Funcionalidad de eliminación pendiente de implementar');
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors"
+                  >
+                    Eliminar todo
+                  </button>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
+                    <div>
+                      <p className="font-medium">Versión</p>
+                      <p className="text-sm text-gray-500">1.0.0</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -495,26 +513,26 @@ style={{
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+              <div className="glass-card rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-brand-500">{tasks.length}</p>
                 <p className="text-xs text-gray-500">Total</p>
               </div>
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+              <div className="glass-card rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-green-500">{stats.completedCount}</p>
                 <p className="text-xs text-gray-500">Hechas</p>
               </div>
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+              <div className="glass-card rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-amber-500">{pendingTasks.length}</p>
                 <p className="text-xs text-gray-500">Pendientes</p>
               </div>
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+              <div className="glass-card rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-red-500">{reminders.length}</p>
                 <p className="text-xs text-gray-500">Eventos</p>
               </div>
             </div>
 
             <div className="py-2">
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+              <div className="glass-card rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm">Esta semana</span>
                   <span className="text-sm font-medium">{stats.completedThisWeek} / {stats.totalThisWeek}</span>
